@@ -24,7 +24,18 @@ fn main() -> Result<()> {
 
     println!("{:?}", metrics.snapshot());
 
-    Ok(())
+    for idx in 0..N {
+        task_worker(idx, metrics.clone())?;
+    }
+
+    for _ in 0..M {
+        requests_worker(metrics.clone())?;
+    }
+
+    loop {
+        thread::sleep(Duration::from_secs(2));
+        println!("{}", metrics);
+    }
 }
 
 #[allow(unused)]
