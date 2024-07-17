@@ -1,5 +1,5 @@
 use anyhow::Result;
-use concurrency::Metrics;
+use concurrency::AmapMetrics;
 use rand::Rng;
 use std::{thread, time::Duration};
 
@@ -9,18 +9,14 @@ const N: usize = 2;
 const M: usize = 4;
 
 fn main() -> Result<()> {
-    let metrics = Metrics::new();
-    // for i in 0..100 {
-    //     metrics.inc("req.page.1");
-    //     metrics.inc("req.page.2");
-    //     if i % 2 == 0 {
-    //         metrics.inc("req.page.3");
-    //     }
-    // }
-
-    // for _ in 0..27 {
-    //     metrics.inc("call.thread.worker.1");
-    // }
+    let metrics = AmapMetrics::new(&[
+        "call.thread.worker.0",
+        "call.thread.worker.1",
+        "req.page.1",
+        "req.page.2",
+        "req.page.3",
+        "req.page.4",
+    ]);
 
     println!("{}", metrics);
 
@@ -39,7 +35,7 @@ fn main() -> Result<()> {
 }
 
 #[allow(unused)]
-fn task_worker(idx: usize, mut metrics: Metrics) -> Result<()> {
+fn task_worker(idx: usize, mut metrics: AmapMetrics) -> Result<()> {
     thread::spawn(move || {
         loop {
             let mut rng = rand::thread_rng();
@@ -53,12 +49,12 @@ fn task_worker(idx: usize, mut metrics: Metrics) -> Result<()> {
 }
 
 #[allow(unused)]
-fn requests_worker(mut metrics: Metrics) -> Result<()> {
+fn requests_worker(mut metrics: AmapMetrics) -> Result<()> {
     thread::spawn(move || {
         loop {
             let mut rng = rand::thread_rng();
             thread::sleep(Duration::from_millis(rng.gen_range(50..800)));
-            let page = rng.gen_range(1..256);
+            let page = rng.gen_range(1..5);
             metrics.inc(format!("req.page.{}", page))?;
         }
         #[allow(unreachable_code)]
