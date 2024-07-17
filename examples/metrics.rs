@@ -22,7 +22,7 @@ fn main() -> Result<()> {
     //     metrics.inc("call.thread.worker.1");
     // }
 
-    println!("{:?}", metrics.snapshot());
+    println!("{}", metrics);
 
     for idx in 0..N {
         task_worker(idx, metrics.clone())?;
